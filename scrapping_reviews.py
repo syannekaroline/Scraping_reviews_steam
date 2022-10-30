@@ -2,6 +2,8 @@ from base64 import encode
 import requests
 import json 
 from bs4 import BeautifulSoup
+from openpyxl import Workbook
+
 
 def get_app_id(game_name):
     response = requests.get(url=f'https://store.steampowered.com/search/?term={game_name}&category1=998', headers={'User-Agent': 'Mozilla/5.0'})
@@ -14,7 +16,7 @@ def get_reviews(appid, params={'json':1}):
         response = requests.get(url=url+appid, params=params, headers={'User-Agent': 'Mozilla/5.0'})
         return response.json()
 
-def get_n_reviews(appid, n=100):
+def get_n_reviews(appid, n=256):
 
     reviews = [] 
     cursor = '*' 
@@ -29,7 +31,7 @@ def get_n_reviews(appid, n=100):
 
     while n > 0: 
         params['cursor'] = cursor.encode() 
-        params['num_per_page'] = min(100, n) 
+        params['num_per_page'] = min(256, n) 
         n -= 100 
 
         response = get_reviews(appid, params) 
@@ -45,8 +47,35 @@ def get_n_reviews(appid, n=100):
 # print(len (get_n_reviews('635320')))
 # for n,review in enumerate(get_n_reviews('635320')):
     # print(n,"-",review['review'])
-reviews =get_n_reviews('635320')
+reviews =get_n_reviews('635320',256)
 # for i in dictionary:
 json_object = json.dumps(reviews, indent = 4,ensure_ascii = False) 
 with open("sample.json", "w") as outfile: 
     outfile.write(json_object) 
+
+def only_review():
+    with open("sample.json", encoding='utf-8') as meu_json:
+        dados = json.load(meu_json)
+    reviews =list()
+    print("Número de Reviews coletadas: ",len(dados))
+
+    for i in dados:
+        reviews.append(i['review'])
+    return  reviews
+
+reviews_list= only_review()
+
+def table_DataBase(list):
+    arquivo= Workbook()
+    plan0=arquivo.active
+
+    plan0.title = "DataBase"
+    plan0.sheet_properties.tabCOLOR = "1079BA"
+    arquivo.save("database.xlsx")
+    plan0["A1"]="Comentários"
+
+    for i in range (len(list)):
+        plan0[f"A{i+2}"]= list[i]
+    arquivo.save("database.xlsx")
+
+table_DataBase(reviews_list)
