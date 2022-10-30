@@ -47,6 +47,7 @@ def get_n_reviews(appid, n=256):
 # print(len (get_n_reviews('635320')))
 # for n,review in enumerate(get_n_reviews('635320')):
     # print(n,"-",review['review'])
+
 reviews =get_n_reviews('635320',256)
 # for i in dictionary:
 json_object = json.dumps(reviews, indent = 4,ensure_ascii = False) 
@@ -54,6 +55,8 @@ with open("sample.json", "w") as outfile:
     outfile.write(json_object) 
 
 def only_review():
+    '''Função que retorna uma lista apenas com as reviews coletadas do arquivo JSON '''
+
     with open("sample.json", encoding='utf-8') as meu_json:
         dados = json.load(meu_json)
     reviews =list()
@@ -63,9 +66,10 @@ def only_review():
         reviews.append(i['review'])
     return  reviews
 
-reviews_list= only_review()
+#reviews_list= only_review()
 
 def table_DataBase(list):
+    ''' Função que insere em uma tabela os comentários coletados'''
     arquivo= Workbook()
     plan0=arquivo.active
 
@@ -78,4 +82,4 @@ def table_DataBase(list):
         plan0[f"A{i+2}"]= list[i]
     arquivo.save("database.xlsx")
 
-table_DataBase(reviews_list)
+#table_DataBase(reviews_list)
