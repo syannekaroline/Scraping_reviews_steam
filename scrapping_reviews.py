@@ -4,19 +4,23 @@ import json
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
-
 def get_app_id(game_name):
+    ''' Função que recebe como parâmetro o nome de um jogo da plataforma steam e retorna seu número de idêntificação correnpondente'''
+
     response = requests.get(url=f'https://store.steampowered.com/search/?term={game_name}&category1=998', headers={'User-Agent': 'Mozilla/5.0'})
     soup = BeautifulSoup(response.text, 'html.parser')
     app_id = soup.find(class_='search_result_row')['data-ds-appid']
+
     return app_id
 
 def get_reviews(appid, params={'json':1}):
-        url = 'https://store.steampowered.com/appreviews/'
-        response = requests.get(url=url+appid, params=params, headers={'User-Agent': 'Mozilla/5.0'})
-        return response.json()
+    ''' Função que realiza a raspagem de reviews e os retorna como uma classe json'''
+    url = 'https://store.steampowered.com/appreviews/'
+    response = requests.get(url=url+appid, params=params, headers={'User-Agent': 'Mozilla/5.0'})
+    return response.json()
 
-def get_n_reviews(appid, n=256):
+def get_n_reviews(appid, n=260):
+    ''' Função que recebe como parâmetro o ID de um jogo e o número de reviews que se quer coletar (padrão n = 260 - max)'''
 
     reviews = [] 
     cursor = '*' 
@@ -31,7 +35,7 @@ def get_n_reviews(appid, n=256):
 
     while n > 0: 
         params['cursor'] = cursor.encode() 
-        params['num_per_page'] = min(256, n) 
+        params['num_per_page'] = min(260, n) 
         n -= 100 
 
         response = get_reviews(appid, params) 
@@ -42,34 +46,22 @@ def get_n_reviews(appid, n=256):
 
     return reviews
 
-# print(get_n_reviews('635320'),10)
-# id=get_app_id("Last Day of June")
-# print(len (get_n_reviews('635320')))
-# for n,review in enumerate(get_n_reviews('635320')):
-    # print(n,"-",review['review'])
+def only_review(arquivo="sample.json"):
+    '''Função que retorna uma lista apenas com as reviews coletadas do arquivo JSON que recebe como parâmetro'''
 
-reviews =get_n_reviews('635320',256)
-# for i in dictionary:
-json_object = json.dumps(reviews, indent = 4,ensure_ascii = False) 
-with open("sample.json", "w") as outfile: 
-    outfile.write(json_object) 
-
-def only_review():
-    '''Função que retorna uma lista apenas com as reviews coletadas do arquivo JSON '''
-
-    with open("sample.json", encoding='utf-8') as meu_json:
+    with open(arquivo, encoding='utf-8') as meu_json:
         dados = json.load(meu_json)
     reviews =list()
-    print("Número de Reviews coletadas: ",len(dados))
 
     for i in dados:
         reviews.append(i['review'])
-    return  reviews
+    print("Número de Reviews coletadas: ",len(reviews))
 
-#reviews_list= only_review()
+    return  reviews
 
 def table_DataBase(list):
     ''' Função que insere em uma tabela os comentários coletados'''
+
     arquivo= Workbook()
     plan0=arquivo.active
 
@@ -78,8 +70,8 @@ def table_DataBase(list):
     arquivo.save("database.xlsx")
     plan0["A1"]="Comentários"
 
-    for i in range (len(list)):
+    for i in range (len(list)) :    
         plan0[f"A{i+2}"]= list[i]
+            
     arquivo.save("database.xlsx")
 
-#table_DataBase(reviews_list)
