@@ -6,5 +6,6 @@
 <p>➥ Se trata de uma raspagem de comentários de usuários do Steam usando python.</p>
 <p>➥ Nesse código é utilizado o ID do jogo "Last day of June" pra raspar as informações de 260 reviwes em pt-BR. Informações essas que contidas no arquivo sample.json</p>
 <p>➥ Por meio da função "table_DataBase" apenas os comentários coletados são armazenados na tabela "DataBase" do arquivo database.xlsx </p>
+<p>➥ O passo a Passo se encontra no arquivo main.ipynb </p>
 
 <h1></h1>
