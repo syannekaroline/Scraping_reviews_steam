@@ -31,7 +31,7 @@ def get_n_reviews(appid, n=260):
             'day_range' : 9223372036854775807, 
             'review_type' : 'all', 
             'purchase_type' : 'all' 
-            } 
+            } # link sobre os parâmetros : https://partner.steamgames.com/doc/store/getreviews
 
     while n > 0: 
         params['cursor'] = cursor.encode() 
@@ -75,3 +75,18 @@ def table_DataBase(list):
             
     arquivo.save("database.xlsx")
 
+
+####################### execução ##########################
+id_game=get_app_id("Last Day of June")
+print(f"ID obtido:{id_game}")
+
+reviews = get_n_reviews(id_game,260)
+
+#escrever/armazenar os dados em um arquivo "sample.json"
+json_object = json.dumps(reviews, indent = 4,ensure_ascii = False) 
+with open("sample.json", "w") as outfile: 
+    outfile.write(json_object) 
+
+reviews_list = only_review("sample.json")
+
+table_DataBase(reviews_list)
